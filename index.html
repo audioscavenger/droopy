@@ -1,0 +1,80 @@
+<!doctype html>
+<html>
+  <head>
+    <link href="style.css" rel="stylesheet" type="text/css">
+    <link href="dropzone.css" rel="stylesheet" type="text/css">
+    
+    <link rel="stylesheet" href="https://unpkg.com/dropzone@5/dist/min/dropzone.min.css" type="text/css" />
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    
+    <script src="https://unpkg.com/dropzone@5/dist/min/dropzone.min.js"></script>
+    <!-- <link href="https://cdnjs.cloudflare.com/ajax/libs/dropzone/5.9.3/dropzone.min.css" rel="stylesheet" type="text/css"> -->
+    <!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/dropzone/5.9.3/min/dropzone.min.js" type="text/javascript"></script> -->
+    
+  </head>
+  <body >
+    <div class="container" >
+    
+      <div class='content'>
+        <script>
+        // https://github.com/dropzone/dropzone/blob/main/src/options.js
+        //$(function () {
+          //var myDropzone = new Dropzone('#dropzone', {
+          Dropzone.options.dropzone = {
+            maxFilesize: 25,                      // megabytes
+            accept: function(file, done) {
+              if (file.name == "config-OPS-VI-LD-CC.7z") {
+                done("Naha, you don't.");
+              } else { done(); }
+            },
+            
+            /*
+            init: function() {
+              this.on("uploadprogress", function(file, progress) {
+                console.log("File progress", progress);
+              });
+            },
+            */
+            
+            maxFilesize: 256,
+            chunking: true,
+            chunkSize: 1000000,
+            parallelChunkUploads: true,
+            retryChunks: true,
+
+            chunksUploaded: function(file, done) {
+              // All chunks have been uploaded. Perform any other actions
+              let currentFile = file;
+              // TODO: html protect fileName
+              let fileName = currentFile.name.split('.').slice(0, -1).join('.') || currentFile.name;
+              let fileExt = currentFile.name.slice((currentFile.name.lastIndexOf(".") - 1 >>> 0) + 2);
+              console.debug(currentFile);
+
+              // This calls server-side code to merge all chunks for the currentFile
+              $.ajax({
+                url: "chunk-concat.php?dzuuid=" + currentFile.upload.uuid + "&dztotalchunkcount=" + currentFile.upload.totalChunkCount + "&fileName=" + fileName + "&fileExt=" + fileExt,
+                success: function (data) {
+                    done();
+                },
+                error: function (msg) {
+                    currentFile.accepted = false;
+                    myDropzone._errorProcessing([currentFile], msg.responseText);
+                }
+              });
+            }
+          }
+          //});
+        //});
+        </script>
+        
+        <!-- <form id="dropzone" action="upload.php" class="dropzone" method="post" enctype="multipart/form-data"> -->
+        <form id="dropzone" action="chunk-upload.php" class="dropzone" method="post" enctype="multipart/form-data">
+          <div class="fallback">
+            <input name="file" type="file" multiple />
+          </div>
+        </form>
+        
+      </div>
+    </div>
+  </body>
+</html>
