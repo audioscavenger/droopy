@@ -6,7 +6,7 @@
 
 // chunk variables
 $fileId = $_POST['dzuuid'];
-$chunkIndex = $_POST['dzchunkindex'] + 1;
+$chunkIndex = $_POST['dzchunkindex'];
 $chunkTotal = $_POST['dztotalchunkcount'];
 
 // file path variables
@@ -16,6 +16,7 @@ $fileSize = $_FILES["file"]["size"];
 $chunkName = "{$fileId}-{$chunkIndex}{$fileExt}";
 $targetFile = $targetPath . $chunkName;
 
+file_put_contents('upload.log', 'fileId ' .$fileId.PHP_EOL, FILE_APPEND);
 file_put_contents('upload.log', date("Y-m-d H:i:s") .' '. $_SERVER["HTTP_CF_IPCOUNTRY"] .' '. $_SERVER["HTTP_X_REAL_IP"] .' '. basename($_FILES["file"]["name"]) .' '. basename($_FILES["file"]["size"]) .' START' .PHP_EOL, FILE_APPEND);
 file_put_contents('upload.log', date("Y-m-d H:i:s") .' '. $_SERVER["HTTP_CF_IPCOUNTRY"] .' '. $_SERVER["HTTP_X_REAL_IP"] .' source='. $chunkName .' => '. $targetFile .PHP_EOL, FILE_APPEND);
 
@@ -27,7 +28,7 @@ chmod(realpath($targetPath), 0777) or die("Could not modify directory permission
 ======================================== */
 
 $returnResponse = function ($info = null, $filelink = null, $status = "ERROR") {
-  file_put_contents('upload.log', date("Y-m-d H:i:s") .' '. $info .' '. $filelink .' '. $status .PHP_EOL, FILE_APPEND);
+  file_put_contents('upload.log', date("Y-m-d H:i:s") .' upload: '. $info .' '. $filelink .' '. $status .PHP_EOL, FILE_APPEND);
   if ($status == "ERROR") die (json_encode( array(
     "status" => $status,
     "info" => $info,

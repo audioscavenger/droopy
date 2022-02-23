@@ -25,7 +25,7 @@ $fileExt = '.'.$_GET['fileExt'];
 ======================================== */
 
 $returnResponse = function ($info = null, $filelink = null, $status = "ERROR") {
-  file_put_contents('upload.log', date("Y-m-d H:i:s") .' '. $info .' '. $filelink .' '. $status .PHP_EOL, FILE_APPEND);
+  file_put_contents('upload.log', date("Y-m-d H:i:s") .' concat: '. $info .' '. $filelink .' '. $status .PHP_EOL, FILE_APPEND);
   if ($status == "ERROR") die (json_encode( array(
     "status" => $status,
     "info" => $info,
@@ -38,7 +38,7 @@ $returnResponse = function ($info = null, $filelink = null, $status = "ERROR") {
 ======================================== */
 
 // loop through temp files and grab the content
-for ($i = 1; $i <= $chunkTotal; $i++) {
+for ($i = 0; $i < $chunkTotal; $i++) {
 
   // target temp file = 184e03c9-3b7b-4083-9185-647b87ba8872-1.ext
   $temp_file_path = realpath("{$targetPath}{$fileId}-{$i}{$fileExt}") or $returnResponse("Your chunk was lost mid-upload.");

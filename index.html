@@ -17,6 +17,8 @@
       <div class='content'>
         <script>
         // https://github.com/dropzone/dropzone/blob/main/src/options.js
+        // https://stackoverflow.com/questions/56156402/how-to-concatenate-chunked-file-uploads-from-dropzone-js-with-php
+        // https://stackoverflow.com/questions/49769853/dropzone-js-chunking
         //$(function () {
           //var myDropzone = new Dropzone('#dropzone', {
           Dropzone.options.dropzone = {
@@ -39,7 +41,8 @@
             chunkSize: 1000000,         // bytes
             parallelChunkUploads: true,
             retryChunks: true,
-
+            forceChunking: true,
+            
             chunksUploaded: function(file, done) {
               // All chunks have been uploaded. Perform any other actions
               let currentFile = file;
