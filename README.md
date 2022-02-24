@@ -1,7 +1,7 @@
 # droopy
 
 droopy is a unique page where you simply drop and upload any file size, thanks to chunking. Based on Dropzone.js and php.
-![drop files here](https://gitea.derewonko.com/audioscavenger/droopy/src/commit/c0f7a8261732922fadd8f00b726d828a1bb4c993/assets/screenshot1.png)
+![drop files here](https://gitea.derewonko.com/audioscavenger/droopy/raw/commit/c0f7a8261732922fadd8f00b726d828a1bb4c993/assets/screenshot1.png)
 
 ## Features
 
