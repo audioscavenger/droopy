@@ -11,12 +11,11 @@ $chunkTotal = $_POST['dztotalchunkcount'];
 
 // file path variables
 $targetPath = dirname( __FILE__ ) . DIRECTORY_SEPARATOR . "uploads" . DIRECTORY_SEPARATOR;
-$fileExt = '.'.pathinfo($_FILES['file']['name'], PATHINFO_EXTENSION);
+$fileExt = '.'.pathinfo(basename($_FILES['file']['name']), PATHINFO_EXTENSION);
 $fileSize = $_FILES["file"]["size"];
 $chunkName = "{$fileId}-{$chunkIndex}{$fileExt}";
 $targetFile = $targetPath . $chunkName;
 
-file_put_contents('upload.log', 'fileId ' .$fileId.PHP_EOL, FILE_APPEND);
 file_put_contents('upload.log', date("Y-m-d H:i:s") .' '. $_SERVER["HTTP_CF_IPCOUNTRY"] .' '. $_SERVER["HTTP_X_REAL_IP"] .' '. basename($_FILES["file"]["name"]) .' '. basename($_FILES["file"]["size"]) .' START' .PHP_EOL, FILE_APPEND);
 file_put_contents('upload.log', date("Y-m-d H:i:s") .' '. $_SERVER["HTTP_CF_IPCOUNTRY"] .' '. $_SERVER["HTTP_X_REAL_IP"] .' source='. $chunkName .' => '. $targetFile .PHP_EOL, FILE_APPEND);
 
@@ -41,9 +40,8 @@ $returnResponse = function ($info = null, $filelink = null, $status = "ERROR") {
 ======================================== */
 
 // blah, blah, blah validation stuff goes here
-if (mb_strlen(basename($_FILES["file"]["name"]), "UTF-8") > 0) $returnResponse("input fileName is null:", $targetFile);
-if (basename($_FILES["file"]['size']) > 0) $returnResponse("targetFile size = 0:", $targetFile);
-if ( $fileSize($targetFile) ) $returnResponse("targetFile missing:", $targetFile);
+if (mb_strlen(basename($_FILES["file"]["name"]), "UTF-8") == 0) $returnResponse("input fileName is null:", $targetFile);
+if (basename($_FILES["file"]['size']) == 0) $returnResponse("targetFile size = 0:", $targetFile);
 
 /* ========================================
   CHUNK UPLOAD

@@ -9,14 +9,12 @@ $targetPath = dirname( __FILE__ ) . DIRECTORY_SEPARATOR . "uploads" . DIRECTORY_
 
 // all the protections and cleanup below should also be done by the js client
 $fileName = basename($_GET['fileName']);
-// Remove anything which isn't a word, whitespace, number
-// or any of the following caracters -_~,;[]().
+// Remove anything which isn't a word, whitespace, number, or any of the following caracters: "-_~[]()."
 // If you don't need to handle multi-byte characters
 // you can use preg_replace rather than mb_ereg_replace
-// Thanks @Łukasz Rysiak!
-$fileName = mb_ereg_replace("([^\w\s\d\-_~,;\[\]\(\).])", '', $fileName);
-// Remove any runs of periods (thanks falstro!)
-$fileName = mb_ereg_replace("([\.]{2,})", '', $fileName);
+$fileName = mb_ereg_replace("([^\w\s\d\-_~,;\[\]\(\)\.])", '', $fileName);
+// Remove any runs of periods
+$fileName = mb_ereg_replace("([\.]{2,})", '.', $fileName);
 
 $fileExt = '.'.$_GET['fileExt'];
 
@@ -52,9 +50,10 @@ for ($i = 0; $i < $chunkTotal; $i++) {
 
   // delete chunk
   unlink($temp_file_path);
-  if ( file_exists($temp_file_path) ) $returnResponse("temp file could not be deleted", $temp_file_path, 'success');
+  if ( file_exists($temp_file_path) ) $returnResponse("temp file could not be deleted", $temp_file_path);
 
 }
+$returnResponse("", $fileName.$fileExt, 'DONE');
 
 /* ========== a bunch of steps I removed below here because they're irrelevant, but I described them anyway ========== */
 // create FileMaker record

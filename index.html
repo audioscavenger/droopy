@@ -2,13 +2,13 @@
 <html>
   <head>
     <link href="style.css" rel="stylesheet" type="text/css">
-    <link rel="stylesheet" href="https://unpkg.com/dropzone@5/dist/min/dropzone.min.css" type="text/css" />
-
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
-    <script src="https://unpkg.com/dropzone@5/dist/min/dropzone.min.js"></script>
-    <!-- dropzone 6 drops support for IE -->
-    <!-- <link href="https://cdnjs.cloudflare.com/ajax/libs/dropzone/5.9.3/dropzone.min.css" rel="stylesheet" type="text/css"> -->
-    <!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/dropzone/5.9.3/min/dropzone.min.js" type="text/javascript"></script> -->
+
+    <!-- dropzone 6 drops support for IE; also cdnjs.cloudflare is 50% faster then unpkg -->
+    <!-- <link rel="stylesheet" href="https://unpkg.com/dropzone@5/dist/min/dropzone.min.css" type="text/css" /> -->
+    <!-- <script src="https://unpkg.com/dropzone@5/dist/min/dropzone.min.js"></script> -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/dropzone/5.9.3/dropzone.min.css" rel="stylesheet" type="text/css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/dropzone/5.9.3/min/dropzone.min.js" type="text/javascript"></script>
     
   </head>
   <body >
@@ -23,7 +23,7 @@
           //var myDropzone = new Dropzone('#dropzone', {
           Dropzone.options.dropzone = {
             accept: function(file, done) {
-              if (file.name == "config-OPS-VI-LD-CC.7z") {
+              if (file.name == "forbidden-filename.vbs") {
                 done("Naha, you don't.");
               } else { done(); }
             },
@@ -50,6 +50,9 @@
               let fileName = currentFile.name.split('.').slice(0, -1).join('.') || currentFile.name;
               let fileExt = currentFile.name.slice((currentFile.name.lastIndexOf(".") - 1 >>> 0) + 2);
               console.debug(currentFile);
+              
+              // Remove anything which isn't a word, whitespace, number, or any of the following caracters: "-_~[]()."
+              fileName.replace(/([^\w\s\d\-_~\[\]\(\)\.]+)/gi, '').replace(/([\.]{2,})/g, '.');
 
               // This calls server-side code to merge all chunks for the currentFile
               $.ajax({
