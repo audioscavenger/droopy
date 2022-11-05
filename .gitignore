@@ -5,8 +5,8 @@ gitsync.cmd
 !redist/
 !test/
 
-# work file
-commit.*.txt
+# work files
+commit*.txt
 *.log
 *.tmp
 

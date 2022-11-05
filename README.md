@@ -8,6 +8,7 @@ Default chunk size of 1000000b to bypass most enterprise proxies that would prev
 ## TODO
 
 ## Features
+version=1.1.0
 
 - [x] fallback methods and command line ready with curl
 - [x] chunking: because sometimes ou are behind a dumb IDS or firewall that will prevent you from uploading more then 1MB at a time
@@ -15,7 +16,6 @@ Default chunk size of 1000000b to bypass most enterprise proxies that would prev
 - [x] works out of the box. No configuration needed
 - [x] forbidden characters protection in filenames uploaded
 - [x] everything goes to /droopy/uploads
-version=1.1.0
 
 ## Installation
 
