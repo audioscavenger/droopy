@@ -5,8 +5,6 @@ droopy is a unique page where you simply drop and upload any file size, thanks t
 
 Default chunk size of 1000000b to bypass most enterprise proxies that would prevent more then 1Mb uploads.
 
-## TODO
-
 ## Features
 version=1.1.0
 
