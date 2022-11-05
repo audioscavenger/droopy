@@ -4,7 +4,11 @@ gitsync.cmd
 !assets/
 !redist/
 !test/
+
+# work file
+commit.*.txt
 *.log
+*.tmp
 
 # ---> Windows
 # Windows thumbnail cache files
