@@ -1,3 +1,10 @@
+# Custom
+*/
+!assets/
+!redist/
+!test/
+*.log
+
 # ---> Windows
 # Windows thumbnail cache files
 Thumbs.db

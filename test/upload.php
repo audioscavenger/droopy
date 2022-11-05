@@ -1,6 +1,8 @@
 <?php
 $target_dir = "uploads".PHP_EOL;
 $input_file = $_FILES["file"]["tmp_name"];
+// unlink because for existing files, they will be appended!!
+unlink($input_file);
 // basename() may prevent filesystem traversal attacks;
 $target_file = basename($_FILES["file"]["name"]);
 // Remove anything which isn't a word, whitespace, number
