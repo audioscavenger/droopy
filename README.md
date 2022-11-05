@@ -25,28 +25,44 @@ There is no security at all, this is PHP. You need at least basic authentication
 
 ## nginx proxy sample
 
-nginx proxy example below for [swag](https://docs.linuxserver.io/images/docker-swag):
+nginx proxy example below for [linuxserver/nginx](https://docs.linuxserver.io/images/docker-nginx):
 ```
-  location ^~ /droopy {
-    # enable the next two lines for http auth
-    auth_basic "Restricted";
-    auth_basic_user_file /config/nginx/.htpasswd;
+server {
+  listen 80 dockerNetworkName;
+  server_name dockerNetworkName;
 
-    # enable the next two lines for ldap auth
-    #auth_request /auth;
-    #error_page 401 =200 /ldaplogin;
-
-    # enable for Authelia
-    #include /config/nginx/authelia-location.conf;
-
-    include /config/nginx/proxy.conf;
-    include /config/nginx/resolver.conf;
-
-    set $upstream_app network-or-container;
-    set $upstream_port 80;
-    set $upstream_proto http;
-    proxy_pass $upstream_proto://$upstream_app:$upstream_port;
+  set $root /var/www/html/yoursite.com/public;
+  if (!-d /var/www/html/yoursite.com/public) {
+      set $root /config/www;
   }
+  root $root;
+  index index.html index.htm index.php;
+
+  ## uploader
+  location /droopy/uploads/ {
+    autoindex on;
+  }
+
+  location / {
+    # enable for basic auth
+    #auth_basic "Restricted";
+    #auth_basic_user_file /config/nginx/.htpasswd;
+
+    try_files $uri $uri/ /index.html /index.php$is_args$args =404;
+  }
+
+  location ~ ^(.+\.php)(.*)$ {
+      fastcgi_split_path_info ^(.+\.php)(.*)$;
+      fastcgi_pass 127.0.0.1:9000;
+      fastcgi_index index.php;
+      include /etc/nginx/fastcgi_params;
+  }
+
+  # deny access to .htaccess/.htpasswd files
+  location ~ /\.ht {
+      deny all;
+  }
+}
 ```
 
 ### TODO
