@@ -43,6 +43,7 @@ file_put_contents($logfile, date("Y-m-d H:i:s") .' , '. $_SERVER["HTTP_CF_IPCOUN
 
 // YOU CANNOT ADD file_put_contents($logfile) inside $returnResponse or uploads will fail completely
 $returnResponse = function ($info = null, $filelink = null, $status = "ERROR") {
+  file_put_contents('upload.log', date("Y-m-d H:i:s") .' upload: '. $info .' '. $filelink .' '. $status .PHP_EOL, FILE_APPEND);
   if ($status == "ERROR") die (json_encode( array(
     "status" => $status,
     "info" => $info,

@@ -1,5 +1,6 @@
 # Custom
 */
+gitsync.cmd
 !assets/
 !redist/
 !test/

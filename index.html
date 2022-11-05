@@ -20,12 +20,12 @@
   </head>
   <body >
     <div>
-      <div>how to use: curl <span id="url"></span>upload-basic.php -F userfile=@MEAPS.js</div>
+      <div>Command line: curl <span id="url"></span>upload-basic.php -F userfile=@<i>file.ext</i></div>
       <form enctype="multipart/form-data" action="upload-basic.php" method="POST">
         <!-- MAX_FILE_SIZE must precede the file input field -->
         <input type="hidden" name="MAX_FILE_SIZE" value="999999" />
         <!-- Name of input element determines name in $_FILES array -->
-        Fallback filesend: <input name="userfile" type="file" />
+        Fallback no chunck: <input name="userfile" type="file" />
         <input type="submit" value="Send File" />
       </form>
     <script type="text/javascript">document.getElementById("url").innerHTML = window.location.href;</script>
@@ -69,7 +69,7 @@
               let fileName = currentFile.name.split('.').slice(0, -1).join('.') || currentFile.name;
               let fileExt = currentFile.name.slice((currentFile.name.lastIndexOf(".") - 1 >>> 0) + 2);
               //console.debug("currentFile:", currentFile);
-              
+
               // Remove anything which isn't a word, whitespace, number, or any of the following caracters: "-_~[]()."
               fileName.replace(/([^\w\s\d\-_~\[\]\(\)\.]+)/gi, '').replace(/([\.]{2,})/g, '.');
 

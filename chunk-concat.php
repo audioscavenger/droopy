@@ -10,14 +10,15 @@ $chunkTotal = $_GET['dztotalchunkcount'];
 $logfile = 'chunk-upload.log';
 $targetPath = dirname( __FILE__ ) . DIRECTORY_SEPARATOR . "uploads" . DIRECTORY_SEPARATOR;
 
-// all the protections and cleanup below may also be done by the js client
-$baseName = basename($_GET['fileName']);
+// all the protections and cleanup below should also be done by the js client
+$fileName = basename($_GET['fileName']);
 // Remove anything which isn't a word, whitespace, number, or any of the following caracters: "-_~[]()."
 // If you don't need to handle multi-byte characters
 // you can use preg_replace rather than mb_ereg_replace
-$baseName = mb_ereg_replace("([^\w\s\d\-_~,;\[\]\(\)\.])", '', $baseName);
+$fileName = mb_ereg_replace("([^\w\s\d\-_~,;\[\]\(\)\.])", '', $fileName);
 // Remove any runs of periods
-$baseName = mb_ereg_replace("([\.]{2,})", '.', $baseName);
+$fileName = mb_ereg_replace("([\.]{2,})", '.', $fileName);
+
 $fileExt = '.'.$_GET['fileExt'];
 $fileExt = ($fileExt == '.') ? '' : $fileExt;
 $fileName = $baseName.$fileExt;
@@ -43,6 +44,7 @@ file_put_contents($logfile, date("Y-m-d H:i:s") .' , '. $_SERVER["HTTP_CF_IPCOUN
 
 // YOU CANNOT ADD file_put_contents($logfile) inside $returnResponse or uploads will fail completely
 $returnResponse = function ($info = null, $filelink = null, $status = "ERROR") {
+  file_put_contents('upload.log', date("Y-m-d H:i:s") .' concat: '. $info .' '. $filelink .' '. $status .PHP_EOL, FILE_APPEND);
   if ($status == "ERROR") die (json_encode( array(
     "status" => $status,
     "info" => $info,
@@ -73,7 +75,7 @@ for ($i = 0; $i < $chunkTotal; $i++) {
   if ( file_exists($temp_file_path) ) $returnResponse("temp file could not be deleted", $temp_file_path);
 
 }
-$returnResponse("", $baseName.$fileExt, 'DONE');
+$returnResponse("", $fileName.$fileExt, 'DONE');
 
 /* ========== a bunch of steps I removed below here because they're irrelevant, but I described them anyway ========== */
 // create FileMaker record

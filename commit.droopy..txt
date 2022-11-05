@@ -1,0 +1,20 @@
+release 1.1.0
+- [ ] mkdir subfolders
+- [ ] add some form options to the front such as chunk size, chunk on/off etc
+- [ ] loads cutomizations off a json file
+- [ ] show newly uploaded files directly under the dropzone
+- [ ] ability to delete newly uploaded files
+- [ ] create an nginx/php quirk to have dynamic and unique urls to share files
+- [ ] ability to setup retention from the front and default retention
+- [x] handle multiple custom subfolders based off a dictionary
+- [x] add non-chunk, command line example
+- [x] add non-chunk, native and basic 1-file upload form
+- [x] handle filename without extension
+  modified:   .gitattributes
+  modified:   .gitignore
+  modified:   LICENSE
+  modified:   README.md
+  deleted:    assets/screenshot1.png
+  modified:   chunk-concat.php
+  modified:   chunk-upload.php
+  modified:   index.html

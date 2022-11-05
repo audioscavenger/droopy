@@ -5,5 +5,7 @@
 CHANGELOG.cmd export-ignore
 README.cmd export-ignore
 *.log export-ignore
+gitsync.cmd export-ignore
+backup/ export-ignore
 assets/ export-ignore
 test/ export-ignore
