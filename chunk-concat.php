@@ -11,13 +11,13 @@ $logfile = 'chunk-upload.log';
 $targetPath = dirname( __FILE__ ) . DIRECTORY_SEPARATOR . "uploads" . DIRECTORY_SEPARATOR;
 
 // all the protections and cleanup below should also be done by the js client
-$fileName = basename($_GET['fileName']);
+$baseName = basename($_GET['fileName']);
 // Remove anything which isn't a word, whitespace, number, or any of the following caracters: "-_~[]()."
 // If you don't need to handle multi-byte characters
 // you can use preg_replace rather than mb_ereg_replace
-$fileName = mb_ereg_replace("([^\w\s\d\-_~,;\[\]\(\)\.])", '', $fileName);
+$baseName = mb_ereg_replace("([^\w\s\d\-_~,;\[\]\(\)\.])", '', $baseName);
 // Remove any runs of periods
-$fileName = mb_ereg_replace("([\.]{2,})", '.', $fileName);
+$baseName = mb_ereg_replace("([\.]{2,})", '.', $baseName);
 
 $fileExt = '.'.$_GET['fileExt'];
 $fileExt = ($fileExt == '.') ? '' : $fileExt;
@@ -32,7 +32,7 @@ foreach($customFiles as $customSubFolder => $arrCutomFiles)
   if (in_array($fileName, $arrCutomFiles)) $targetPath = dirname( __FILE__ ) . DIRECTORY_SEPARATOR . $customSubFolder . DIRECTORY_SEPARATOR;
 }
 
-file_put_contents($logfile, date("Y-m-d H:i:s") .' , '. $_SERVER["HTTP_CF_IPCOUNTRY"] .' , '. $_SERVER["HTTP_X_REAL_IP"] .' , chunk-upload: '. "fileName={$fileName}" .PHP_EOL, FILE_APPEND);
+file_put_contents($logfile, date("Y-m-d H:i:s") .' , '. $_SERVER["HTTP_CF_IPCOUNTRY"] .' , '. $_SERVER["HTTP_X_REAL_IP"] .' , chunk-concat: '. "fileName={$fileName}" .PHP_EOL, FILE_APPEND);
 file_put_contents($logfile, date("Y-m-d H:i:s") .' , '. $_SERVER["HTTP_CF_IPCOUNTRY"] .' , '. $_SERVER["HTTP_X_REAL_IP"] .' , chunk-concat: '. "targetPath={$targetPath}" .PHP_EOL, FILE_APPEND);
 
 // unlink because for existing files, they will be appended!!
