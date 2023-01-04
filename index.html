@@ -55,7 +55,7 @@
             },
             */
             
-            maxFilesize: 256,           // Mbytes
+            maxFilesize: 2048,           // Mbytes
             chunking: true,
             chunkSize: 1000000,         // bytes
             parallelChunkUploads: true,
@@ -71,7 +71,8 @@
               //console.debug("currentFile:", currentFile);
 
               // Remove anything which isn't a word, whitespace, number, or any of the following caracters: "-_~[]()."
-              fileName.replace(/([^\w\s\d\-_~\[\]\(\)\.]+)/gi, '').replace(/([\.]{2,})/g, '.');
+              <!-- fileName.replace(/([^\w\s\d\-_~\[\]\(\)\.]+)/gi, '').replace(/([\.]{2,})/g, '.'); -->
+              fileName.replace(/([^\w \d\-_~\[\]\(\)\.]+)/gi, '').replace(/([\.]{2,})/g, '.');
 
               // This calls server-side code to merge all chunks for the currentFile
               //console.debug("url:","chunk-concat.php?dzuuid=" + currentFile.upload.uuid + "&dztotalchunkcount=" + currentFile.upload.totalChunkCount + "&fileName=" + fileName + "&fileExt=" + fileExt);

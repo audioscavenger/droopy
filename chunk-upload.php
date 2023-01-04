@@ -10,8 +10,16 @@ $chunkTotal = $_POST['dztotalchunkcount'];
 // file path variables
 $logfile = 'chunk-upload.log';
 $targetPath = dirname( __FILE__ ) . DIRECTORY_SEPARATOR . "uploads" . DIRECTORY_SEPARATOR;
-$fileName = basename($_FILES["file"]["name"]);
-$fileExt = '.'.pathinfo(basename($_FILES['file']['name']), PATHINFO_EXTENSION);
+$baseName = basename($_FILES["file"]["name"]);
+// Remove anything which isn't a word, whitespace, number, or any of the following caracters: "-_~[]()."
+// If you don't need to handle multi-byte characters
+// you can use preg_replace rather than mb_ereg_replace
+// $baseName = mb_ereg_replace("([^\w\s\d\-_~,;\[\]\(\)\.])", '', $baseName);
+$baseName = mb_ereg_replace("([^\w \d\-_~,;\[\]\(\)\.])", '', $baseName);
+// Remove any runs of periods
+$baseName = mb_ereg_replace("([\.]{2,})", '.', $baseName);
+
+$fileExt = '.'.pathinfo(basename($_FILES["file"]["name"]), PATHINFO_EXTENSION);
 $fileExt = ($fileExt == '.') ? '' : $fileExt;
 $fileSize = $_FILES["file"]["size"];
 $chunkName = "{$fileId}-{$chunkIndex}{$fileExt}";
@@ -22,7 +30,7 @@ $customFiles = array(
 );
 foreach($customFiles as $customSubFolder => $arrCutomFiles)
 {
-  if (in_array($fileName, $arrCutomFiles)) $targetPath = dirname( __FILE__ ) . DIRECTORY_SEPARATOR . $customSubFolder . DIRECTORY_SEPARATOR;
+  if (in_array($baseName, $arrCutomFiles)) $targetPath = dirname( __FILE__ ) . DIRECTORY_SEPARATOR . $customSubFolder . DIRECTORY_SEPARATOR;
 }
 
 
@@ -30,7 +38,7 @@ $targetFile = $targetPath . $chunkName;
 // unlink because for existing files, they will be appended!!
 unlink($targetFile);
 
-file_put_contents($logfile, date("Y-m-d H:i:s") .' , '. $_SERVER["HTTP_CF_IPCOUNTRY"] .' , '. $_SERVER["HTTP_X_REAL_IP"] .' , chunk-upload: '. "fileName={$fileName}" .' '. basename($_FILES["file"]["size"]) .' START' .PHP_EOL, FILE_APPEND);
+file_put_contents($logfile, date("Y-m-d H:i:s") .' , '. $_SERVER["HTTP_CF_IPCOUNTRY"] .' , '. $_SERVER["HTTP_X_REAL_IP"] .' , chunk-upload: '. "fileName={$baseName}" .' '. basename($_FILES["file"]["size"]) .' START' .PHP_EOL, FILE_APPEND);
 file_put_contents($logfile, date("Y-m-d H:i:s") .' , '. $_SERVER["HTTP_CF_IPCOUNTRY"] .' , '. $_SERVER["HTTP_X_REAL_IP"] .' , chunk-upload: '. "targetPath={$targetPath}" .PHP_EOL, FILE_APPEND);
 file_put_contents($logfile, date("Y-m-d H:i:s") .' , '. $_SERVER["HTTP_CF_IPCOUNTRY"] .' , '. $_SERVER["HTTP_X_REAL_IP"] .' , chunk-upload: '. 'source='. $chunkName .' => '. $chunkName .PHP_EOL, FILE_APPEND);
 

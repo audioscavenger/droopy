@@ -15,7 +15,8 @@ $baseName = basename($_GET['fileName']);
 // Remove anything which isn't a word, whitespace, number, or any of the following caracters: "-_~[]()."
 // If you don't need to handle multi-byte characters
 // you can use preg_replace rather than mb_ereg_replace
-$baseName = mb_ereg_replace("([^\w\s\d\-_~,;\[\]\(\)\.])", '', $baseName);
+// $baseName = mb_ereg_replace("([^\w\s\d\-_~,;\[\]\(\)\.])", '', $baseName);
+$baseName = mb_ereg_replace("([^\w \d\-_~,;\[\]\(\)\.])", '', $baseName);
 // Remove any runs of periods
 $baseName = mb_ereg_replace("([\.]{2,})", '.', $baseName);
 
