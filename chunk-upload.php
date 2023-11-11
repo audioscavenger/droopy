@@ -2,6 +2,11 @@
 // TODO: mkdir subfolders
 // TODO: use json config files
 
+//////////////////////////////////////////
+////////// custom variables //////////////
+$uploadPath = "elFinder" . DIRECTORY_SEPARATOR . "files";
+//////////////////////////////////////////
+
 // chunk variables
 $fileId = $_POST['dzuuid'];
 $chunkIndex = $_POST['dzchunkindex'];
@@ -9,7 +14,7 @@ $chunkTotal = $_POST['dztotalchunkcount'];
 
 // file path variables
 $logfile = 'chunk-upload.log';
-$targetPath = dirname( __FILE__ ) . DIRECTORY_SEPARATOR . "uploads" . DIRECTORY_SEPARATOR;
+$targetPath = dirname( __FILE__ ) . DIRECTORY_SEPARATOR . $uploadPath . DIRECTORY_SEPARATOR;
 $baseName = basename($_FILES["file"]["name"]);
 // Remove anything which isn't a word, whitespace, number, or any of the following caracters: "-_~[]()."
 // If you don't need to handle multi-byte characters
@@ -26,19 +31,18 @@ $chunkName = "{$fileId}-{$chunkIndex}{$fileExt}";
 
 // Custom special case just for you: next step is to load the dict off a json file and have various subdirectories+fileLists
 $customFiles = array(
-  "nQ"  => array('get-nQ.cmd')
+  "elFinder/nQ"  => array('get-nQ.cmd','nQ.cmd')
 );
 foreach($customFiles as $customSubFolder => $arrCutomFiles)
 {
   if (in_array($baseName, $arrCutomFiles)) $targetPath = dirname( __FILE__ ) . DIRECTORY_SEPARATOR . $customSubFolder . DIRECTORY_SEPARATOR;
 }
 
-
 $targetFile = $targetPath . $chunkName;
 // unlink because for existing files, they will be appended!!
 unlink($targetFile);
 
-file_put_contents($logfile, date("Y-m-d H:i:s") .' , '. $_SERVER["HTTP_CF_IPCOUNTRY"] .' , '. $_SERVER["HTTP_X_REAL_IP"] .' , chunk-upload: '. "fileName={$baseName}" .' '. basename($_FILES["file"]["size"]) .' START' .PHP_EOL, FILE_APPEND);
+file_put_contents($logfile, date("Y-m-d H:i:s") .' , '. $_SERVER["HTTP_CF_IPCOUNTRY"] .' , '. $_SERVER["HTTP_X_REAL_IP"] .' , chunk-upload: '. "fileName={$baseName}" .' '. $fileSize .'b START' .PHP_EOL, FILE_APPEND);
 file_put_contents($logfile, date("Y-m-d H:i:s") .' , '. $_SERVER["HTTP_CF_IPCOUNTRY"] .' , '. $_SERVER["HTTP_X_REAL_IP"] .' , chunk-upload: '. "targetPath={$targetPath}" .PHP_EOL, FILE_APPEND);
 file_put_contents($logfile, date("Y-m-d H:i:s") .' , '. $_SERVER["HTTP_CF_IPCOUNTRY"] .' , '. $_SERVER["HTTP_X_REAL_IP"] .' , chunk-upload: '. 'source='. $chunkName .' => '. $chunkName .PHP_EOL, FILE_APPEND);
 
@@ -51,7 +55,7 @@ file_put_contents($logfile, date("Y-m-d H:i:s") .' , '. $_SERVER["HTTP_CF_IPCOUN
 
 // YOU CANNOT ADD file_put_contents($logfile) inside $returnResponse or uploads will fail completely
 $returnResponse = function ($info = null, $filelink = null, $status = "ERROR") {
-  file_put_contents('upload.log', date("Y-m-d H:i:s") .' upload: '. $info .' '. $filelink .' '. $status .PHP_EOL, FILE_APPEND);
+  file_put_contents('chunk-upload-response.log', date("Y-m-d H:i:s") .' chunk-upload: '. $info .' '. $filelink .' '. $status .PHP_EOL, FILE_APPEND);
   if ($status == "ERROR") die (json_encode( array(
     "status" => $status,
     "info" => $info,
@@ -65,7 +69,7 @@ $returnResponse = function ($info = null, $filelink = null, $status = "ERROR") {
 
 // blah, blah, blah validation stuff goes here
 if (mb_strlen(basename($_FILES["file"]["name"]), "UTF-8") == 0) $returnResponse("input fileName is null:", $targetFile);
-if (basename($_FILES["file"]['size']) == 0) $returnResponse("targetFile size = 0:", $targetFile);
+if ($fileSize == 0) $returnResponse("targetFile size = 0:", $targetFile);
 
 /* ========================================
   CHUNK UPLOAD
@@ -74,7 +78,7 @@ if (basename($_FILES["file"]['size']) == 0) $returnResponse("targetFile size = 0
 if (move_uploaded_file($_FILES['file']['tmp_name'], $targetFile)) {
   $status = 1;
 } else {
-  file_put_contents($logfile, date("Y-m-d H:i:s") .' , '. $_SERVER["HTTP_CF_IPCOUNTRY"] .' , '. $_SERVER["HTTP_X_REAL_IP"] .' , chunk-upload: '. basename($_FILES["file"]["name"]) .' '. basename($_FILES["file"]["size"]) .' ERROR moving file' .PHP_EOL, FILE_APPEND);
+  file_put_contents($logfile, date("Y-m-d H:i:s") .' , '. $_SERVER["HTTP_CF_IPCOUNTRY"] .' , '. $_SERVER["HTTP_X_REAL_IP"] .' , chunk-upload: '. basename($_FILES["file"]["name"]) .' '. $fileSize .'b ERROR moving file' .PHP_EOL, FILE_APPEND);
 }
 
 // Be sure that the file has been uploaded

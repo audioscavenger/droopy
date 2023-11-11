@@ -2,13 +2,18 @@
 // TODO: mkdir subfolders
 // TODO: use json config files
 
+//////////////////////////////////////////
+////////// custom variables //////////////
+$uploadPath = "elFinder" . DIRECTORY_SEPARATOR . "files";
+//////////////////////////////////////////
+
 // get variables
 $fileId = $_GET['dzuuid'];
 $chunkTotal = $_GET['dztotalchunkcount'];
 
 // file path variables
 $logfile = 'chunk-upload.log';
-$targetPath = dirname( __FILE__ ) . DIRECTORY_SEPARATOR . "uploads" . DIRECTORY_SEPARATOR;
+$targetPath = dirname( __FILE__ ) . DIRECTORY_SEPARATOR . $uploadPath . DIRECTORY_SEPARATOR;
 
 // all the protections and cleanup below should also be done by the js client
 $baseName = basename($_GET['fileName']);
@@ -26,7 +31,7 @@ $fileName = $baseName.$fileExt;
 
 // Custom special case just for you: next step is to load the dict off a json file and have various subdirectories+fileLists
 $customFiles = array(
-  "nQ"  => array('get-nQ.cmd')
+  "elFinder/nQ"  => array('get-nQ.cmd','nQ.cmd')
 );
 foreach($customFiles as $customSubFolder => $arrCutomFiles)
 {
@@ -45,7 +50,7 @@ file_put_contents($logfile, date("Y-m-d H:i:s") .' , '. $_SERVER["HTTP_CF_IPCOUN
 
 // YOU CANNOT ADD file_put_contents($logfile) inside $returnResponse or uploads will fail completely
 $returnResponse = function ($info = null, $filelink = null, $status = "ERROR") {
-  file_put_contents('upload.log', date("Y-m-d H:i:s") .' concat: '. $info .' '. $filelink .' '. $status .PHP_EOL, FILE_APPEND);
+  file_put_contents('chunk-upload-response.log', date("Y-m-d H:i:s") .' chunk-concat: '. $info .' '. $filelink .' '. $status .PHP_EOL, FILE_APPEND);
   if ($status == "ERROR") die (json_encode( array(
     "status" => $status,
     "info" => $info,
