@@ -7,6 +7,10 @@
 $uploadPath = "elFinder" . DIRECTORY_SEPARATOR . "files";
 //////////////////////////////////////////
 
+$keys = ['REMOTE_ADDR','HTTP_X_FORWARDED_FOR','HTTP_CF_CONNECTING_IP','HTTP_X_REAL_IP'];  // we can't tell if behind a proxy or if any of these are set
+foreach ($keys as $key) { $remote_addr = isset($_SERVER[$key]) ? $_SERVER[$key] : '';}
+$remote_country = isset($_SERVER["HTTP_CF_IPCOUNTRY"]) ? $_SERVER["HTTP_CF_IPCOUNTRY"] : '??';
+
 // get variables
 $fileId = $_GET['dzuuid'];
 $chunkTotal = $_GET['dztotalchunkcount'];
@@ -31,19 +35,19 @@ $fileName = $baseName.$fileExt;
 
 // Custom special case just for you: next step is to load the dict off a json file and have various subdirectories+fileLists
 $customFiles = array(
-  "elFinder/nQ"  => array('get-nQ.cmd','nQ.cmd')
+  "nQ"  => array('get-nQ.cmd','nQ.cmd')
 );
 foreach($customFiles as $customSubFolder => $arrCutomFiles)
 {
   if (in_array($fileName, $arrCutomFiles)) $targetPath = dirname( __FILE__ ) . DIRECTORY_SEPARATOR . $customSubFolder . DIRECTORY_SEPARATOR;
 }
 
-file_put_contents($logfile, date("Y-m-d H:i:s") .' , '. $_SERVER["HTTP_CF_IPCOUNTRY"] .' , '. $_SERVER["HTTP_X_REAL_IP"] .' , chunk-concat: '. "fileName={$fileName}" .PHP_EOL, FILE_APPEND);
-file_put_contents($logfile, date("Y-m-d H:i:s") .' , '. $_SERVER["HTTP_CF_IPCOUNTRY"] .' , '. $_SERVER["HTTP_X_REAL_IP"] .' , chunk-concat: '. "targetPath={$targetPath}" .PHP_EOL, FILE_APPEND);
+file_put_contents($logfile, date("Y-m-d H:i:s") .' , '. $remote_country .' , '. $remote_addr .' , chunk-concat: '. "fileName={$fileName}" .PHP_EOL, FILE_APPEND);
+file_put_contents($logfile, date("Y-m-d H:i:s") .' , '. $remote_country .' , '. $remote_addr .' , chunk-concat: '. "targetPath={$targetPath}" .PHP_EOL, FILE_APPEND);
 
-// unlink because for existing files, they will be appended!!
-unlink("{$targetPath}{$fileName}");
-file_put_contents($logfile, date("Y-m-d H:i:s") .' , '. $_SERVER["HTTP_CF_IPCOUNTRY"] .' , '. $_SERVER["HTTP_X_REAL_IP"] .' , chunk-concat: '. "unlink {$fileName}" .PHP_EOL, FILE_APPEND);
+// unlink if exist, or file will be appended!!
+@unlink("{$targetPath}{$fileName}");
+file_put_contents($logfile, date("Y-m-d H:i:s") .' , '. $remote_country .' , '. $remote_addr .' , chunk-concat: '. "unlink {$fileName}" .PHP_EOL, FILE_APPEND);
 /* ========================================
   DEPENDENCY FUNCTIONS
 ======================================== */
@@ -73,7 +77,7 @@ for ($i = 0; $i < $chunkTotal; $i++) {
   if ( empty($chunk) ) $returnResponse("Chunks are uploading as empty strings.");
 
   // add chunk to main file
-  file_put_contents($logfile, date("Y-m-d H:i:s") .' , '. $_SERVER["HTTP_CF_IPCOUNTRY"] .' , '. $_SERVER["HTTP_X_REAL_IP"] .' , chunk-concat: '. "FILE_APPEND {$fileId}-{$i}{$fileExt} to {$baseName}{$fileExt}" .PHP_EOL, FILE_APPEND);
+  file_put_contents($logfile, date("Y-m-d H:i:s") .' , '. $remote_country .' , '. $remote_addr .' , chunk-concat: '. "FILE_APPEND {$fileId}-{$i}{$fileExt} to {$baseName}{$fileExt}" .PHP_EOL, FILE_APPEND);
   file_put_contents("{$targetPath}{$baseName}{$fileExt}", $chunk, FILE_APPEND | LOCK_EX);
 
   // delete chunk

@@ -7,6 +7,10 @@
 $uploadPath = "elFinder" . DIRECTORY_SEPARATOR . "files";
 //////////////////////////////////////////
 
+$keys = ['REMOTE_ADDR','HTTP_X_FORWARDED_FOR','HTTP_CF_CONNECTING_IP','HTTP_X_REAL_IP'];  // we can't tell if behind a proxy or if any of these are set
+foreach ($keys as $key) { $remote_addr = isset($_SERVER[$key]) ? $_SERVER[$key] : '';}
+$remote_country = isset($_SERVER["HTTP_CF_IPCOUNTRY"]) ? $_SERVER["HTTP_CF_IPCOUNTRY"] : '??';
+
 // chunk variables
 $fileId = $_POST['dzuuid'];
 $chunkIndex = $_POST['dzchunkindex'];
@@ -31,7 +35,7 @@ $chunkName = "{$fileId}-{$chunkIndex}{$fileExt}";
 
 // Custom special case just for you: next step is to load the dict off a json file and have various subdirectories+fileLists
 $customFiles = array(
-  "elFinder/nQ"  => array('get-nQ.cmd','nQ.cmd')
+  "nQ"  => array('get-nQ.cmd','nQ.cmd')
 );
 foreach($customFiles as $customSubFolder => $arrCutomFiles)
 {
@@ -39,12 +43,12 @@ foreach($customFiles as $customSubFolder => $arrCutomFiles)
 }
 
 $targetFile = $targetPath . $chunkName;
-// unlink because for existing files, they will be appended!!
-unlink($targetFile);
+// unlink if exist, or file will be appended!!
+@unlink($targetFile);
 
-file_put_contents($logfile, date("Y-m-d H:i:s") .' , '. $_SERVER["HTTP_CF_IPCOUNTRY"] .' , '. $_SERVER["HTTP_X_REAL_IP"] .' , chunk-upload: '. "fileName={$baseName}" .' '. $fileSize .'b START' .PHP_EOL, FILE_APPEND);
-file_put_contents($logfile, date("Y-m-d H:i:s") .' , '. $_SERVER["HTTP_CF_IPCOUNTRY"] .' , '. $_SERVER["HTTP_X_REAL_IP"] .' , chunk-upload: '. "targetPath={$targetPath}" .PHP_EOL, FILE_APPEND);
-file_put_contents($logfile, date("Y-m-d H:i:s") .' , '. $_SERVER["HTTP_CF_IPCOUNTRY"] .' , '. $_SERVER["HTTP_X_REAL_IP"] .' , chunk-upload: '. 'source='. $chunkName .' => '. $chunkName .PHP_EOL, FILE_APPEND);
+file_put_contents($logfile, date("Y-m-d H:i:s") .' , '. $remote_country .' , '. $remote_addr .' , chunk-upload: '. "fileName={$baseName}" .' '. $fileSize .'b START' .PHP_EOL, FILE_APPEND);
+file_put_contents($logfile, date("Y-m-d H:i:s") .' , '. $remote_country .' , '. $remote_addr .' , chunk-upload: '. "targetPath={$targetPath}" .PHP_EOL, FILE_APPEND);
+file_put_contents($logfile, date("Y-m-d H:i:s") .' , '. $remote_country .' , '. $remote_addr .' , chunk-upload: '. 'source='. $chunkName .' => '. $chunkName .PHP_EOL, FILE_APPEND);
 
 // change directory permissions
 // chmod(realpath($targetPath), 0777) or die("Could not modify directory permissions.");
@@ -78,7 +82,7 @@ if ($fileSize == 0) $returnResponse("targetFile size = 0:", $targetFile);
 if (move_uploaded_file($_FILES['file']['tmp_name'], $targetFile)) {
   $status = 1;
 } else {
-  file_put_contents($logfile, date("Y-m-d H:i:s") .' , '. $_SERVER["HTTP_CF_IPCOUNTRY"] .' , '. $_SERVER["HTTP_X_REAL_IP"] .' , chunk-upload: '. basename($_FILES["file"]["name"]) .' '. $fileSize .'b ERROR moving file' .PHP_EOL, FILE_APPEND);
+  file_put_contents($logfile, date("Y-m-d H:i:s") .' , '. $remote_country .' , '. $remote_addr .' , chunk-upload: '. basename($_FILES["file"]["name"]) .' '. $fileSize .'b ERROR moving file' .PHP_EOL, FILE_APPEND);
 }
 
 // Be sure that the file has been uploaded

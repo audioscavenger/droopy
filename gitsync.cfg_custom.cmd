@@ -13,11 +13,11 @@ set editor=notepad
 :: PROJECT= should match the root folder
 set PROJECT=droopy
 :: projectConfig= can be empty == the main batch file that holds a line that says "set version=x.y.z", scrapped to fill in commit file header
-set projectConfig=%PROJECT%.cmd
+set projectConfig=index.html
 :: buildVersion= a version string like x.y.z used as header in the commit file, coming from %projectConfig%
 :: If your project does not have such a file, and buildVersionAutomated=empty, your will be prompted for a version == not unattended
 :: setting up buildVersionAutomated=x.y.z avoids this prompt pause, if you want this script to be fully unattended and not have a projectConfig file
-set buildVersionAutomated=1.1.2
+set buildVersionAutomated=
 :: textFiles are textFiles extensions, add your own to the list
 set textFiles=*.txt *.txt *.cmd *.bat *.pl *.awk *.ps1 *.ini *.cfg *.sql *.xml *.yml *.yaml *.config *.json *.properties
 :: is true, process textFiles with busybox unix2dos before :local_backup

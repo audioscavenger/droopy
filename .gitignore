@@ -1,9 +1,16 @@
 # Custom
 */
 gitsync.cmd
+elFinder/
+files/
+nQ/
+backup/
+uploads/
+
 !assets/
 !redist/
 !test/
+
 
 # work files
 commit*.txt
