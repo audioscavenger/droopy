@@ -6,7 +6,6 @@ droopy is a unique page where you simply drop and upload any file size, thanks t
 Default chunk size of 1000000b to bypass most enterprise proxies that would prevent more then 1Mb uploads.
 
 ## Features
-version=1.1.1
 
 - [x] fallback methods and command line ready with curl
 - [x] chunking: because sometimes ou are behind a dumb IDS or firewall that will prevent you from uploading more then 1MB at a time
@@ -70,9 +69,10 @@ server {
 - [ ] add some form options to the front such as chunk size, chunk on/off etc
 - [ ] loads cutomizations off a json file
 - [ ] show newly uploaded files directly under the dropzone
-- [ ] ability to delete newly uploaded files
+- [ ] ability to delete newly uploaded files, until page refresh
 - [ ] create an nginx/php quirk to have dynamic and unique urls to share files
-- [ ] ability to setup retention from the front and default retention
+- [ ] ability to setup retention from the front and default retention at the backend
+- [x] protect filenames in the _GET
 - [x] handle multiple custom subfolders based off a dictionary
 - [x] add non-chunk, command line example
 - [x] add non-chunk, native and basic 1-file upload form
