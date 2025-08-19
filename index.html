@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
   <head>
-    <!--# version: 1.2.0 -->
+    <!--# version: 1.3.0 -->
     <!-- <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script> -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.1/jquery.min.js"></script>
     <!-- fallback -->
@@ -23,8 +23,8 @@
     <div>
       <div>Command line: curl <span id="url"></span>upload-basic.php -F userfile=@<i>file.ext</i></div>
       <form enctype="multipart/form-data" action="upload-basic.php" method="POST">
-        <!-- MAX_FILE_SIZE must precede the file input field -->
-        <input type="hidden" name="MAX_FILE_SIZE" value="100999999" />
+        <!-- MAX_FILE_SIZE must precede the file input field // not sure it's even used -->
+        <input type="hidden" name="MAX_FILE_SIZE" value="2147483648" />
         <!-- Name of input element determines name in $_FILES array -->
         Fallback no chunck: <input name="userfile" type="file" />
         <input type="submit" value="Send File" />
@@ -39,23 +39,24 @@
         // https://stackoverflow.com/questions/56156402/how-to-concatenate-chunked-file-uploads-from-dropzone-js-with-php
         // https://stackoverflow.com/questions/49769853/dropzone-js-chunking
         // $(function () {    // this gives an error: Uncaught Error: Dropzone already attached.
-          // myDropzone = new Dropzone('#dropzone', {
+          //myDropzone = new Dropzone('#dropzone', {
           Dropzone.options.dropzone = {
             accept: function(file, done) {
-              // console.debug(Dropzone);
+              // console.debug('file',file);
               if (file.name == "forbidden-filename.vbs") {
                 done("Naha, you don't.");
+              // } else if (file.type == "image/png") {
+                // done("Naha, you don't.");
               } else { done(); }
             },
-            
             /*
+            // apparently not needed anymore
             init: function() {
               this.on("uploadprogress", function(file, progress) {
                 console.log("File progress", progress);
               });
             },
             */
-            
             maxFilesize: 2048,           // Mbytes
             chunking: true,
             chunkSize: 1000000,         // bytes
@@ -65,27 +66,64 @@
             
             chunksUploaded: function(file, done) {
               // All chunks have been uploaded. Perform any other actions
-              let currentFile = file;
-              // TODO: html protect fileName
-              let fileName = currentFile.name.split('.').slice(0, -1).join('.') || currentFile.name;
-              let fileExt = currentFile.name.slice((currentFile.name.lastIndexOf(".") - 1 >>> 0) + 2);
-              //console.debug("currentFile:", currentFile);
-
+              // file.name: "1x1 - Copy.png"
+              // file.type: "image/png"
+              
+              // TODO: html protect fileName?
+              let fileName = file.name.split('.').slice(0, -1).join('.') || file.name;
+              let fileExt = file.name.slice((file.name.lastIndexOf(".") - 1 >>> 0) + 2);
+              let subFolder = (fileExt.toUpperCase() == 'NEF') ? 'DCIM/' : '';
+              
+              // The below is done on the PHP side so we shall not do it here
               // Remove anything which isn't a word, whitespace, number, or any of the following caracters: "-_~[]()."
-              <!-- fileName.replace(/([^\w\s\d\-_~\[\]\(\)\.]+)/gi, '').replace(/([\.]{2,})/g, '.'); -->
-              fileName.replace(/([^\w \d\-_~\[\]\(\)\.]+)/gi, '').replace(/([\.]{2,})/g, '.');
+              //var htmlName = file.name.replace(/([^\w\s\d\-_~\,\;\[\]\(\)\.]+)/, '')
+              // also Remove any runs of periods
+              //htmlName = htmlName.replace(/([\.]{2,})/, '.');
+              
+              
+              /*
+              // Remove anything which isn't a word, whitespace, number, or any of the following caracters: "-_~[]()."
+              $fileName = mb_ereg_replace("([^\w\s\d\-_~\,\;\[\]\(\)\.])", '', $_GET['fileName']);
+              // also Remove any runs of periods
+              $fileName = mb_ereg_replace("([\.]{2,})", '', $fileName);
+              // Remove anything which isn't a word, whitespace, number, or any of the following caracters: "-_~[]()"
+              $fileExt = mb_ereg_replace("([^\w\s\d\-_~\,\;\[\]\(\)])", '', $_GET['fileExt']);
+              */
 
-              // This calls server-side code to merge all chunks for the currentFile
-              //console.debug("url:","chunk-concat.php?dzuuid=" + currentFile.upload.uuid + "&dztotalchunkcount=" + currentFile.upload.totalChunkCount + "&fileName=" + fileName + "&fileExt=" + fileExt);
+
+              // This calls server-side code to merge all chunks for the file
+              // This is where you can alter the result icon to show a download link for instance
+              // https://stackoverflow.com/questions/21050275/download-uploaded-file-with-dropzonejs
+              
+              // console.debug("url","chunk-concat.php?dzuuid=" + file.upload.uuid + "&dztotalchunkcount=" + file.upload.totalChunkCount + "&fileName=" + fileName + "&fileExt=" + fileExt);
+              
               $.ajax({
-                url: "chunk-concat.php?dzuuid=" + currentFile.upload.uuid + "&dztotalchunkcount=" + currentFile.upload.totalChunkCount + "&fileName=" + fileName + "&fileExt=" + fileExt,
+                url: "chunk-concat.php?dzuuid=" + file.upload.uuid + "&dztotalchunkcount=" + file.upload.totalChunkCount + "&fileName=" + encodeURI(fileName) + "&fileExt=" + encodeURI(fileExt),
                 success: function (data) {
-                    done();
+                  // console.debug('data',data);                     // {"status":"DONE","info":"","file_link":"uploads\/filename.ext"}
+                  // console.debug('file',file);                     // object
+                  // console.debug('file.name',file.name);           // "favicon - /\\'[x] Copy...png"
+                  // console.debug('fileName',fileName+"."+fileExt); // sent as POST
+                  // console.debug('htmlName',escape(htmlName));     // expected remote name
+                  
+                  var htmlName = encodeURI(JSON.parse(data).file_link);
+                  
+                  let div = document.createElement('div');
+                  div.setAttribute('style', 'font-size:smaller; text-align: center;');
+                  let a = document.createElement('a');
+                  a.setAttribute('style', 'cursor: pointer;');
+                  a.setAttribute('href',"/droopy/" + subFolder + escape(htmlName) + "?nocache=" + Date.now());
+                  a.innerHTML = "download";
+                  
+                  div.appendChild(a);
+                  file.previewTemplate.appendChild(div);
+                  
+                  done();
                 },
                 error: function (msg) {
                     console.error(msg);
-                    currentFile.accepted = false;
-                    myDropzone._errorProcessing([currentFile], msg.responseText);
+                    file.accepted = false;
+                    //myDropzone._errorProcessing([file], msg.responseText); // var myDropzone = new Dropzone
                 }
               });
             }
