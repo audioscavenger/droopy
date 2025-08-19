@@ -7,12 +7,14 @@ Default chunk size of 1000000b to bypass most enterprise proxies that would prev
 
 ## Features
 
+- [x] file names are html protected
+- [x] shows download link under each file
+- [x] handles custom subfolders based on file extension or name
 - [x] fallback methods and command line ready with curl
 - [x] chunking: because sometimes ou are behind a dumb IDS or firewall that will prevent you from uploading more then 1MB at a time
 - [x] simplicity
 - [x] works out of the box. No configuration needed
 - [x] forbidden characters protection in filenames uploaded
-- [x] everything goes to /droopy/uploads
 
 ## Installation
 
@@ -20,7 +22,7 @@ Clone the repo, `mkdir droopy/uploads` subfolder and other cutom subfolders if n
 
 ## Word of wisdom
 
-There is no security at all, this is PHP. You need at least basic authentication at the nginx level, or bad things will happen to you.
+There is no security at all, this is PHP. You need at least basic authentication at the nginx level, or bad things will happen to you. Unless you want it public as I do.
 
 ## nginx proxy sample
 
@@ -65,15 +67,18 @@ server {
 ```
 
 ### TODO
-- [ ] mkdir subfolders
+- [ ] PHP prevents file system from exploding
 - [ ] add some form options to the front such as chunk size, chunk on/off etc
-- [ ] loads cutomizations off a json file
-- [ ] show newly uploaded files directly under the dropzone
+- [ ] loads cutomizations from a json file or custom.inc
 - [ ] ability to delete newly uploaded files, until page refresh
-- [ ] create an nginx/php quirk to have dynamic and unique urls to share files
+- [ ] create an nginx/php quirk to have dynamic and unique urls to share files?
 - [ ] ability to setup retention from the front and default retention at the backend
+- [x] mkdir subfolders
+- [x] file names are html protected
+- [x] shows download link under each file
+- [x] handles custom subfolders based on file extension or name
 - [x] protect filenames in the _GET
-- [x] handle multiple custom subfolders based off a dictionary
+- [x] handle multiple custom subfolders based on a dictionary
 - [x] add non-chunk, command line example
 - [x] add non-chunk, native and basic 1-file upload form
 - [x] handle filename without extension
