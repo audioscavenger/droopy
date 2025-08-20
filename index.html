@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
   <head>
-    <!--# version: 1.3.1 -->
+    <!--# version: 1.3.2 -->
     <!-- <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script> -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.1/jquery.min.js"></script>
     <!-- fallback -->
@@ -104,15 +104,15 @@
                   // console.debug('file',file);                     // object
                   // console.debug('file.name',file.name);           // "favicon - /\\'[x] Copy...png"
                   // console.debug('fileName',fileName+"."+fileExt); // sent as POST
-                  // console.debug('htmlName',escape(htmlName));     // expected remote name
                   
-                  var htmlName = encodeURI(JSON.parse(data).file_link);
+                  var htmlName = encodeURI(JSON.parse(data).file_link); // htmlName is html encoded already by JSON.parse
+                  // console.debug('htmlName',htmlName);     // expected remote name html encoded
                   
                   let div = document.createElement('div');
                   div.setAttribute('style', 'font-size:smaller; text-align: center;');
                   let a = document.createElement('a');
                   a.setAttribute('style', 'cursor: pointer;');
-                  a.setAttribute('href',"/droopy/" + subFolder + escape(htmlName) + "?nocache=" + Date.now());
+                  a.setAttribute('href',"/droopy/" + subFolder + htmlName + "?nocache=" + Date.now());
                   a.innerHTML = "download";
                   
                   div.appendChild(a);

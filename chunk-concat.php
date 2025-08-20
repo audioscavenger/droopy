@@ -99,6 +99,11 @@ $returnResponse = function ($info = null, $filelink = null, $status = "ERROR") {
     "info" => $info,
     "file_link" => $filelink
   )));
+  logger(json_encode( array(
+    "status" => $status,
+    "info" => $info,
+    "file_link" => $filelink
+  )));
   echo json_encode( array(
     "status" => $status,
     "info" => $info,
